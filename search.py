@@ -14,7 +14,7 @@ import torch.nn as nn
 
 import datasets
 from model import CNN
-from nni.retiarii.oneshot.pytorch import DartsTrainer
+from darts import DartsTrainer
 from utils import accuracy
 
 
