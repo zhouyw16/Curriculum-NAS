@@ -16,7 +16,7 @@ import torch.nn as nn
 import datasets
 from model import CNN
 from darts import DartsTrainer
-from utils import accuracy, set_logger
+from utils import accuracy, set_logger, set_random
 
 
 
@@ -35,8 +35,13 @@ parser.add_argument('--seed', default=98765, type=int)
 args = parser.parse_args()
 
 if args.seed > 0:
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
+    set_random(args.seed)
+
+if not os.path.exists('checkpoints'):
+    os.mkdir('checkpoints')
+local_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+logger = set_logger('nni', 
+    log_file=os.path.join('checkpoints', local_time + '.log'), log_console=False)
 
 device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
 
@@ -48,11 +53,6 @@ criterion = nn.CrossEntropyLoss()
 optim = torch.optim.SGD(model.parameters(), 0.025, momentum=0.9, weight_decay=3.0E-4)
 lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, args.epochs, eta_min=0.001)
 
-if not os.path.exists('checkpoints'):
-    os.mkdir('checkpoints')
-local_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
-logger = set_logger('nni', 
-    log_file=os.path.join('checkpoints', local_time + '.log'), log_console=False)
 
 trainer = DartsTrainer(
     model=model,

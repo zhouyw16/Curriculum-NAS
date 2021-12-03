@@ -2,6 +2,10 @@
 # Licensed under the MIT license.
 import logging
 
+import random
+import numpy as np
+import torch
+
 def accuracy(output, target, topk=(1,)):
     """ Computes the precision@k for the specified values of k """
     maxk = max(topk)
@@ -21,6 +25,15 @@ def accuracy(output, target, topk=(1,)):
         res["acc{}".format(k)] = correct_k.mul_(1.0 / batch_size).item()
     return res
 
+def set_random(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+
 
 def set_logger(log_name, log_file=None, log_console=True):
     logger = logging.getLogger(log_name)
@@ -39,5 +52,5 @@ def set_logger(log_name, log_file=None, log_console=True):
         console_handler.setLevel(logging.INFO)
         console_handler.setFormatter(formatter)
         logger.addHandler(console_handler)
-        
+
     return logger
