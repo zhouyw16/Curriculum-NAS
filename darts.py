@@ -37,8 +37,6 @@ from nni.retiarii.oneshot.pytorch.utils import \
     AverageMeterGroup, replace_layer_choice, replace_input_choice, to_device
 
 
-_logger = logging.getLogger(__name__)
-
 
 class DartsLayerChoice(nn.Module):
     def __init__(self, layer_choice):
@@ -131,7 +129,7 @@ class DartsTrainer(BaseOneShotTrainer):
     def __init__(self, model, loss, metrics, optimizer,
                  num_epochs, dataset, grad_clip=5.,
                  learning_rate=2.5E-3, batch_size=64, workers=4,
-                 device=None, log_frequency=None,
+                 device=None, logger=None, log_frequency=None,
                  arc_learning_rate=3.0E-4, unrolled=False):
         self.model = model
         self.loss = loss
@@ -141,6 +139,7 @@ class DartsTrainer(BaseOneShotTrainer):
         self.batch_size = batch_size
         self.workers = workers
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') if device is None else device
+        self.logger = logging.getLogger(__name__) if logger is None else logger
         self.log_frequency = log_frequency
         self.model.to(self.device)
 
@@ -208,7 +207,7 @@ class DartsTrainer(BaseOneShotTrainer):
             metrics['loss'] = loss.item()
             meters.update(metrics)
             if self.log_frequency is not None and step % self.log_frequency == 0:
-                _logger.info('Epoch [%s/%s] Step [%s/%s]  %s', epoch + 1,
+                self.logger.info('Epoch [%s/%s] Step [%s/%s]  %s', epoch + 1,
                              self.num_epochs, step + 1, len(self.train_loader), meters)
 
     def _logits_and_loss(self, X, y):
@@ -281,7 +280,7 @@ class DartsTrainer(BaseOneShotTrainer):
         norm = torch.cat([w.view(-1) for w in dw]).norm()
         eps = 0.01 / norm
         if norm < 1E-8:
-            _logger.warning('In computing hessian, norm is smaller than 1E-8, cause eps to be %.6f.', norm.item())
+            self.logger.warning('In computing hessian, norm is smaller than 1E-8, cause eps to be %.6f.', norm.item())
 
         dalphas = []
         for e in [eps, -2. * eps]:

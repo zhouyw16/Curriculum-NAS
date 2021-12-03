@@ -22,20 +22,22 @@ def accuracy(output, target, topk=(1,)):
     return res
 
 
-def set_logger(log_name, log_file):
+def set_logger(log_name, log_file=None, log_console=True):
     logger = logging.getLogger(log_name)
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter(
-        '%(asctime)s %(levelname)-8s %(message)s')
+        ("%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s"))
 
-    file_handler = logging.FileHandler(log_file, mode='w')
-    file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+    if log_file:
+        file_handler = logging.FileHandler(log_file, mode='w')
+        file_handler.setLevel(logging.INFO)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
 
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
+    if log_console:
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+        
     return logger

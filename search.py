@@ -8,6 +8,7 @@ import time
 from argparse import ArgumentParser
 
 import numpy as np
+from numpy.lib import utils
 import torch
 import torch.nn as nn
 
@@ -15,7 +16,7 @@ import torch.nn as nn
 import datasets
 from model import CNN
 from darts import DartsTrainer
-from utils import accuracy
+from utils import accuracy, set_logger
 
 
 
@@ -47,6 +48,11 @@ criterion = nn.CrossEntropyLoss()
 optim = torch.optim.SGD(model.parameters(), 0.025, momentum=0.9, weight_decay=3.0E-4)
 lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, args.epochs, eta_min=0.001)
 
+if not os.path.exists('checkpoints'):
+    os.mkdir('checkpoints')
+local_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+logger = set_logger('nni', 
+    log_file=os.path.join('checkpoints', local_time + '.log'), log_console=False)
 
 trainer = DartsTrainer(
     model=model,
@@ -56,6 +62,7 @@ trainer = DartsTrainer(
     num_epochs=args.epochs,
     dataset=dataset_train,
     batch_size=args.batch_size,
+    logger=logger,
     log_frequency=args.log_frequency,
     unrolled=args.unrolled,
     device=device
@@ -66,8 +73,5 @@ except KeyboardInterrupt:
     pass
 final_architecture = trainer.export()
 print('Final architecture:', trainer.export())
-if not os.path.exists('checkpoints'):
-    os.mkdir('checkpoints')
-local_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
 with open(os.path.join('checkpoints', local_time + '.json'), 'w') as checkpoint:
     json.dump(trainer.export(), checkpoint)
