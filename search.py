@@ -15,7 +15,7 @@ import torch.nn as nn
 import datasets
 from model import CNN
 from nni.retiarii.oneshot.pytorch import DartsTrainer
-from utils import accuracy
+from utils import accuracy, set_logger
 
 
 
@@ -37,7 +37,6 @@ if args.seed > 0:
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
 
-logger = logging.getLogger('nni')
 device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
 
 dataset_train, dataset_valid = datasets.get_dataset(os.path.join('data', args.dataset))
@@ -67,9 +66,8 @@ except KeyboardInterrupt:
     pass
 final_architecture = trainer.export()
 print('Final architecture:', trainer.export())
-
 if not os.path.exists('checkpoints'):
     os.mkdir('checkpoints')
-fname = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.json'
-with open(os.path.join('checkpoints', fname), 'w') as checkpoint:
+local_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+with open(os.path.join('checkpoints', local_time + '.json'), 'w') as checkpoint:
     json.dump(trainer.export(), checkpoint)
