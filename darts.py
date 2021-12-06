@@ -31,6 +31,9 @@ import copy
 import logging
 from collections import OrderedDict
 
+import numpy as np
+from scipy.special import lambertw
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -205,8 +208,7 @@ class DartsTrainer(BaseOneShotTrainer):
             # TODO: alpha -> max
             logits = disc_model(trn_X)
             loss = self.loss(logits, trn_y)
-            # TODO: weights
-            weights = torch.ones_like(loss)
+            weights = self._confident_weights(loss)
             
             # phase 2: child network step
             self.model_optim.zero_grad()
@@ -222,6 +224,15 @@ class DartsTrainer(BaseOneShotTrainer):
             if self.log_frequency is not None and step % self.log_frequency == 0:
                 self.logger.info('Epoch [%s/%s] Step [%s/%s]  %s', epoch + 1,
                              self.num_epochs, step + 1, len(self.train_loader), meters)
+
+    def _confident_weights(self, loss):
+        origin_loss = loss.detach().cpu().numpy()
+        tau = np.log(self.model.n_classes)
+        lam = 1.0
+        beta = (origin_loss - tau) / lam
+        gamma = -2.0 / np.exp(1.0)
+        sigma = np.exp(-lambertw(0.5 * np.maximum(beta, gamma))).real
+        return torch.from_numpy(sigma).to(self.device)
 
     def _logits_and_loss(self, X, y, weights=None):
         logits = self.model(X)
