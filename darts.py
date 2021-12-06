@@ -208,7 +208,7 @@ class DartsTrainer(BaseOneShotTrainer):
             # TODO: alpha -> max
             logits = disc_model(trn_X)
             loss = self.loss(logits, trn_y)
-            weights = self._confident_weights(loss)
+            weights = self._confidence_weight(loss)
             
             # phase 2: child network step
             self.model_optim.zero_grad()
@@ -225,7 +225,7 @@ class DartsTrainer(BaseOneShotTrainer):
                 self.logger.info('Epoch [%s/%s] Step [%s/%s]  %s', epoch + 1,
                              self.num_epochs, step + 1, len(self.train_loader), meters)
 
-    def _confident_weights(self, loss):
+    def _confidence_weight(self, loss):
         origin_loss = loss.detach().cpu().numpy()
         tau = np.log(self.model.n_classes)
         lam = 1.0
