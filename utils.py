@@ -35,7 +35,7 @@ def set_random(seed):
     torch.backends.cudnn.deterministic = True
 
 
-def set_logger(log_name, log_file=None, log_console=True):
+def set_logger(log_name, log_file=None, log_console=False):
     logger = logging.getLogger(log_name)
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter(

@@ -106,6 +106,7 @@ class CNN(nn.Module):
         self.n_classes = n_classes
         self.n_layers = n_layers
         self.aux_pos = 2 * n_layers // 3 if auxiliary else -1
+        self.input_argv = (input_size, in_channels, channels, n_classes, n_layers)
 
         c_cur = stem_multiplier * self.channels
         self.stem = nn.Sequential(

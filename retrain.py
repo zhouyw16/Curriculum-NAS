@@ -45,7 +45,7 @@ valid_loader = torch.utils.data.DataLoader(
     dataset_valid, batch_size=args.batch_size, shuffle=False, num_workers=args.workers, pin_memory=True)
 
 with fixed_arch(args.checkpoint):
-    model = CNN(32, 3, 36, 10, args.layers, auxiliary=True)
+    model = CNN(32, 3, 36, 10, args.layers, auxiliary=True) # (32, 3, 36, 10, 20)
 criterion = nn.CrossEntropyLoss()
 
 model.to(device)

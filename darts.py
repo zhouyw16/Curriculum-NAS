@@ -25,7 +25,8 @@ class BaseOneShotTrainer(abc.ABC):
         pass
 
 
-
+import os
+import json
 import copy
 import logging
 from collections import OrderedDict
@@ -33,8 +34,12 @@ from collections import OrderedDict
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+from nni.retiarii import fixed_arch
 from nni.retiarii.oneshot.pytorch.utils import \
     AverageMeterGroup, replace_layer_choice, replace_input_choice, to_device
+
+from model import CNN
 
 
 
@@ -132,7 +137,7 @@ class DartsTrainer(BaseOneShotTrainer):
                  device=None, logger=None, log_frequency=None,
                  arc_learning_rate=3.0E-4, unrolled=False):
         self.model = model
-        self.loss = loss
+        self.loss = loss # NOTE: output of loss is a vector
         self.metrics = metrics
         self.num_epochs = num_epochs
         self.dataset = dataset
@@ -187,7 +192,7 @@ class DartsTrainer(BaseOneShotTrainer):
             trn_X, trn_y = to_device(trn_X, self.device), to_device(trn_y, self.device)
             val_X, val_y = to_device(val_X, self.device), to_device(val_y, self.device)
 
-            # phase 1. architecture step
+            # phase 1: architecture step
             self.ctrl_optim.zero_grad()
             if self.unrolled:
                 self._unrolled_backward(trn_X, trn_y, val_X, val_y)
@@ -195,9 +200,17 @@ class DartsTrainer(BaseOneShotTrainer):
                 self._backward(val_X, val_y)
             self.ctrl_optim.step()
 
+            # phase 1.5: reweight step
+            disc_model = copy.deepcopy(self.model)
+            # TODO: alpha -> max
+            logits = disc_model(trn_X)
+            loss = self.loss(logits, trn_y)
+            # TODO: weights
+            weights = torch.ones_like(loss)
+            
             # phase 2: child network step
             self.model_optim.zero_grad()
-            logits, loss = self._logits_and_loss(trn_X, trn_y)
+            logits, loss = self._logits_and_loss(trn_X, trn_y, weights)
             loss.backward()
             if self.grad_clip > 0:
                 nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)  # gradient clipping
@@ -210,9 +223,12 @@ class DartsTrainer(BaseOneShotTrainer):
                 self.logger.info('Epoch [%s/%s] Step [%s/%s]  %s', epoch + 1,
                              self.num_epochs, step + 1, len(self.train_loader), meters)
 
-    def _logits_and_loss(self, X, y):
+    def _logits_and_loss(self, X, y, weights=None):
         logits = self.model(X)
-        loss = self.loss(logits, y)
+        if weights is None:
+            loss = self.loss(logits, y).mean()
+        else:
+            loss = (self.loss(logits, y) * weights).mean()
         return logits, loss
 
     def _backward(self, val_X, val_y):
