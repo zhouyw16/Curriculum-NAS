@@ -138,7 +138,7 @@ class DartsTrainer(BaseOneShotTrainer):
                  num_epochs, dataset, grad_clip=5.,
                  learning_rate=2.5E-3, batch_size=64, workers=4,
                  device=None, logger=None, log_frequency=None,
-                 arc_learning_rate=3.0E-4, unrolled=False):
+                 arc_learning_rate=3.0E-4, unrolled=False, curriculum=False):
         self.model = model
         self.loss = loss # NOTE: output of loss is a vector
         self.metrics = metrics
@@ -149,6 +149,7 @@ class DartsTrainer(BaseOneShotTrainer):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') if device is None else device
         self.logger = logging.getLogger(__name__) if logger is None else logger
         self.log_frequency = log_frequency
+        self.curriculum = curriculum
         self.model.to(self.device)
 
         self.nas_modules = []
@@ -204,11 +205,19 @@ class DartsTrainer(BaseOneShotTrainer):
             self.ctrl_optim.step()
 
             # phase 1.5: reweight step
-            disc_model = copy.deepcopy(self.model)
-            # TODO: alpha -> max
-            logits = disc_model(trn_X)
-            loss = self.loss(logits, trn_y)
-            weights = self._confidence_weight(loss)
+            if self.curriculum:
+                with torch.no_grad():
+                    # approximately convert the continuous model to a discrete one
+                    disc_model = copy.deepcopy(self.model)
+                    for module in disc_model.modules():
+                        if isinstance(module, DartsInputChoice) \
+                        or isinstance(module, DartsLayerChoice):
+                            module.alpha[torch.argmax(module.alpha)] = 1.0
+                    logits = disc_model(trn_X)
+                    loss = self.loss(logits, trn_y)
+                    weights = self._confidence_weight(loss)
+            else:
+                weights = torch.ones_like(trn_y)
             
             # phase 2: child network step
             self.model_optim.zero_grad()

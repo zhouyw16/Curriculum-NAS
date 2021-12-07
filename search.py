@@ -23,7 +23,7 @@ from utils import accuracy, set_logger, set_random
 parser = ArgumentParser('darts')
 parser.add_argument('--dataset', default='cifar10', type=str)
 parser.add_argument('--layers', default=8, type=int)
-parser.add_argument('--batch-size', default=32, type=int) # 64
+parser.add_argument('--batch-size', default=64, type=int)
 parser.add_argument('--log-frequency', default=10, type=int)
 parser.add_argument('--epochs', default=50, type=int)
 parser.add_argument('--channels', default=16, type=int)
@@ -32,7 +32,8 @@ parser.add_argument('--visualization', default=False, action='store_true')
 parser.add_argument('--v1', default=False, action='store_true')
 parser.add_argument('--device', default='cuda:0', type=str)
 parser.add_argument('--seed', default=98765, type=int)
-parser.add_argument('--no-save-log', default=False, action='store_true')
+parser.add_argument('--curriculum', default=False, action='store_true')
+parser.add_argument('--no-save', default=False, action='store_true')
 args = parser.parse_args()
 
 if args.seed > 0:
@@ -41,7 +42,7 @@ if args.seed > 0:
 if not os.path.exists('checkpoints'):
     os.mkdir('checkpoints')
 local_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
-logger = None if args.no_save_log else \
+logger = None if args.no_save else \
     set_logger('nni', log_file=os.path.join('checkpoints', local_time + '.log'))
 
 device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
@@ -66,6 +67,7 @@ trainer = DartsTrainer(
     logger=logger,
     log_frequency=args.log_frequency,
     unrolled=args.unrolled,
+    curriculum=args.curriculum,
     device=device
 )
 try:
@@ -74,5 +76,6 @@ except KeyboardInterrupt:
     pass
 final_architecture = trainer.export()
 print('Final architecture:', final_architecture)
-with open(os.path.join('checkpoints', local_time + '.json'), 'w') as checkpoint:
-    json.dump(final_architecture, checkpoint)
+if not args.no_save:
+    with open(os.path.join('checkpoints', local_time + '.json'), 'w') as checkpoint:
+        json.dump(final_architecture, checkpoint)
