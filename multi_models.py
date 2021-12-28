@@ -25,7 +25,7 @@ parser.add_argument('--channels', default=16, type=int)
 parser.add_argument('--layers', default=5, type=int)
 parser.add_argument('--lr', type=float, default=0.001)
 parser.add_argument('--batch-size', default=96, type=int)
-parser.add_argument('--early-stop', default=5, type=int)
+parser.add_argument('--early-stop', default=10, type=int)
 parser.add_argument('--log-frequency', default=10, type=int)
 parser.add_argument('--epochs', default=600, type=int)
 parser.add_argument('--aux-weight', default=0.4, type=float)
@@ -139,7 +139,7 @@ for model, optimizer, writer in zip(models, optimizers, writers):
 
     best_top1 = 0.
     best_top5 = 0.
-    # early_stop = args.early_stop
+    early_stop = args.early_stop
 
     for epoch in range(args.epochs):
         drop_prob = args.drop_path_prob * epoch / args.epochs
@@ -152,15 +152,15 @@ for model, optimizer, writer in zip(models, optimizers, writers):
         cur_step = (epoch + 1) * len(train_loader)
         top1, top5 = validate(args, valid_loader, model, criterion, epoch, cur_step, writer)
 
+        # early stopping
+        if top1 > best_top1:
+            early_stop = args.early_stop
+        else:
+            early_stop -= 1
+            if early_stop == 0:
+                break
+
         best_top1 = max(best_top1, top1)
         best_top5 = max(best_top5, top5)
-        # early stopping
-        # if top1 > best_top1:
-        #     best_top1 = top1
-        #     early_stop = args.early_stop
-        # else:
-        #     early_stop -= 1
-        #     if early_stop == 0:
-        #         break
-
+        
     logger.info('Final best Prec@1 = {:.4%} Prec@5 = {:.4%}'.format(best_top1, best_top5))

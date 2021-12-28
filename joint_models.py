@@ -41,7 +41,7 @@ parser.add_argument('--channels', default=16, type=int)
 parser.add_argument('--layers', default=5, type=int)
 parser.add_argument('--lr', type=float, default=0.001)
 parser.add_argument('--batch-size', default=96, type=int)
-parser.add_argument('--early-stop', default=5, type=int)
+parser.add_argument('--early-stop', default=10, type=int)
 parser.add_argument('--log-frequency', default=10, type=int)
 parser.add_argument('--epochs', default=600, type=int)
 parser.add_argument('--aux-weight', default=0.4, type=float)
@@ -186,16 +186,16 @@ for epoch in range(args.epochs):
 
     data_weights = data_losses.detach().sqrt()
 
-    best_top1 = max(best_top1, top1)
-    best_top5 = max(best_top5, top5)
     # early stopping
     # if top1 > best_top1:
-    #     best_top1 = top1
     #     early_stop = args.early_stop
     # else:
     #     early_stop -= 1
     #     if early_stop == 0:
     #         break
+
+    best_top1 = max(best_top1, top1)
+    best_top5 = max(best_top5, top5)
 
     logger.info('Final best Prec@1 = {:.4%} Prec@5 = {:.4%}'.format(best_top1, best_top5))
 

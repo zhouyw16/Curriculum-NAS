@@ -1,0 +1,2 @@
+multi-models: Final best model = 5 best Prec@1 = 88.4700% best Prec@5 = 99.6200% 
+joint-models: Final best model = 3 best Prec@1 = 89.0400% best Prec@5 = 99.6500% 
