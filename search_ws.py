@@ -41,6 +41,7 @@ import numpy as np
 from scipy.special import lambertw
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from xautodl.config_utils import \
     load_config, dict2config, configure2str
@@ -55,8 +56,6 @@ from xautodl.log_utils import \
     AverageMeter, time_string, convert_secs2time
 from xautodl.models import \
     get_cell_based_tiny_net, get_search_spaces
-from xautodl.models.cell_searchs import \
-    GenericNAS201Model
 from nats_bench import create
 
 
@@ -71,83 +70,6 @@ class CLDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.dataset)
-
-
-
-class DataGenericNAS201Model(GenericNAS201Model):
-    def __init__(self, C, N, max_nodes, num_classes, search_space, affine, track_running_stats):
-        # TODO
-        super(DataGenericNAS201Model, self).__init__(
-            C, N, max_nodes, num_classes, search_space, affine, track_running_stats)
-        
-    def childnet_normalize_archp(self):
-        if self.mode == "gdas":
-            while True:
-                gumbels = -torch.empty_like(self.arch_parameters).exponential_().log()
-                logits = (self.arch_parameters.log_softmax(dim=1) + gumbels) / self.tau
-                probs = nn.functional.softmax(logits, dim=1)
-                index = probs.max(-1, keepdim=True)[1]
-                one_h = torch.zeros_like(logits).scatter_(-1, index, 1.0)
-                hardwts = one_h - probs.detach() + probs
-                if torch.isinf(gumbels).any() or torch.isinf(probs).any() \
-                or torch.isnan(probs).any():
-                    continue
-                else:
-                    break
-            with torch.no_grad():
-                hardwts_cpu = hardwts.detach().cpu()
-            return hardwts, hardwts_cpu, index, "GUMBEL"
-        else:
-            # TODO
-            alphas = torch.zeros_like(self.arch_parameters) \
-                .scatter_(1, torch.argmax(self.arch_parameters, dim=-1, keepdim=True), 1)
-            index = alphas.max(-1, keepdim=True)[1]
-            with torch.no_grad():
-                alphas_cpu = alphas.detach().cpu()
-            return alphas, alphas_cpu, index, "SOFTMAX"
-        
-    def childnet_forward(self, inputs):
-        # TODO
-        alphas, alphas_cpu, index, verbose_str = self.childnet_normalize_archp()
-        verbose_str = "SOFTMAX"
-
-        feature = self._stem(inputs)
-        for i, cell in enumerate(self._cells):
-            try:
-                if self.mode == "urs":
-                    feature = cell.forward_urs(feature)
-                    if self.verbose:
-                        verbose_str += "-forward_urs"
-                elif self.mode == "select":
-                    feature = cell.forward_select(feature, alphas_cpu)
-                    if self.verbose:
-                        verbose_str += "-forward_select"
-                elif self.mode == "joint":
-                    feature = cell.forward_joint(feature, alphas)
-                    if self.verbose:
-                        verbose_str += "-forward_joint"
-                elif self.mode == "dynamic":
-                    feature = cell.forward_dynamic(feature, self.dynamic_cell)
-                    if self.verbose:
-                        verbose_str += "-forward_dynamic"
-                elif self.mode == "gdas":
-                    feature = cell.forward_gdas(feature, alphas, index)
-                    if self.verbose:
-                        verbose_str += "-forward_gdas"
-                else:
-                    print("invalid mode={:}".format(self.mode))
-                    exit()
-            except:
-                feature = cell(feature)
-            if self.drop_path is not None:
-                feature = drop_path(feature, self.drop_path)
-        if self.verbose and random.random() < 0.001:
-            print(verbose_str)
-        out = self.lastact(feature)
-        out = self.global_pooling(out)
-        out = out.view(out.size(0), -1)
-        logits = self.classifier(out)
-        return out, logits
 
 
 
@@ -427,7 +349,9 @@ def get_topk_loss(xloader, network, n_samples, w_criterion, algo):
         for i, sampled_arch in enumerate(archs):
             network.set_cal_mode("dynamic", sampled_arch)
             for inputs, targets, _, _, indices in xloader:
-                _, logits = network(inputs.cuda(non_blocking=True))
+                inputs = inputs.cuda(non_blocking=True)
+                targets = targets.cuda(non_blocking=True)
+                _, logits = network(inputs)
                 losses[indices] += w_criterion(logits, targets).detach()
 
         return losses.detach()
@@ -530,10 +454,7 @@ def main(xargs):
         None,)
     logger.log("search space : {:}".format(search_space))
     logger.log("model config : {:}".format(model_config))
-    # TODO
-    # search_model = get_cell_based_tiny_net(model_config)
-    search_model = DataGenericNAS201Model(model_config.C, model_config.N, model_config.max_nodes, model_config.num_classes,
-        model_config.space, model_config.affine, model_config.track_running_stats,)
+    search_model = get_cell_based_tiny_net(model_config)
     search_model.set_algo(xargs.algo)
     # logger.log("{:}".format(search_model))
 
@@ -595,6 +516,7 @@ def main(xargs):
         epoch_str = "{:03d}-{:03d}".format(epoch, total_epoch)
         logger.log("\n[Search the {:}-th epoch] {:}, LR={:}".format(epoch_str, need_time, min(w_scheduler.get_lr())))
 
+        logger.log('*Data Weights* {:}'.format(data_weights))
         network.set_drop_path(float(epoch + 1) / total_epoch, xargs.drop_path_rate)
         if xargs.algo == "gdas":
             network.set_tau(xargs.tau_max - (xargs.tau_max - xargs.tau_min) * epoch / (total_epoch - 1))
@@ -632,7 +554,7 @@ def main(xargs):
         valid_accuracies[epoch] = valid_a_top1
 
         # TODO
-        data_losses = get_topk_loss(search_loader, network, xargs.weight_candidate_num, xargs.algo)
+        data_losses = get_topk_loss(search_loader, network, xargs.weight_candidate_num, w_criterion, xargs.algo)
         data_weights = F.normalize(data_losses.sqrt(), p=1, dim=-1) * len(search_dataset)
 
         genotypes[epoch] = genotype

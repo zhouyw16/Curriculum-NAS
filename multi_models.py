@@ -58,7 +58,8 @@ for i in range(args.models):
         models.append(model)
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         optimizers.append(optimizer)
-        writer = SummaryWriter('runs/multi-%d' % i)
+        local_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+        writer = SummaryWriter('runs/multi-%d-%s' % (i, local_time))
         writers.append(writer)
 
 criterion = nn.CrossEntropyLoss()

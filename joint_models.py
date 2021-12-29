@@ -162,7 +162,7 @@ best_top5 = 0.
 
 for epoch in range(args.epochs):
 
-    print(data_weights)
+    logger.info(data_weights)
 
     data_losses = torch.zeros(len(dataset_train)).to(device)
 

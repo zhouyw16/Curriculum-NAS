@@ -1,2 +1,9 @@
-multi-models: Final best model = 5 best Prec@1 = 88.4700% best Prec@5 = 99.6200% 
-joint-models: Final best model = 3 best Prec@1 = 89.0400% best Prec@5 = 99.6500% 
+Without normalization:
+    multi-models: Final best model = 5 Prec@1 = 88.4700% Prec@5 = 99.6200% 
+    joint-models: Final best model = 3 Prec@1 = 89.0400% Prec@5 = 99.6500% (multi)
+
+
+With normalization:
+    multi-models: Final best model = 5 Prec@1 = 88.4700% Prec@5 = 99.6200% 
+    joint-models: Final best model = 3 Prec@1 = 89.0400% Prec@5 = 99.6500% (multi)
+    joint-models: Final best model = 1 Prec@1 = 68.6900% Prec@5 = 97.0800% (div)
