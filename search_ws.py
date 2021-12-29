@@ -430,7 +430,7 @@ def get_topk_loss(xloader, network, n_samples, w_criterion, algo):
                 _, logits = network(inputs.cuda(non_blocking=True))
                 losses[indices] += w_criterion(logits, targets).detach()
 
-        return losses
+        return losses.detach()
 
 def get_best_arch(xloader, network, n_samples, algo):
     with torch.no_grad():
@@ -631,8 +631,9 @@ def main(xargs):
             epoch_str, valid_a_loss, valid_a_top1, valid_a_top5, genotype))
         valid_accuracies[epoch] = valid_a_top1
 
+        # TODO
         data_losses = get_topk_loss(search_loader, network, xargs.weight_candidate_num, xargs.algo)
-        data_weights = data_losses.detach().sqrt()
+        data_weights = F.normalize(data_losses.sqrt(), p=1, dim=-1) * len(search_dataset)
 
         genotypes[epoch] = genotype
         logger.log("<<<--->>> The {:}-th epoch : {:}".format(epoch_str, genotypes[epoch]))

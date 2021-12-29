@@ -71,7 +71,8 @@ for i in range(args.models):
         models.append(model)
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         optimizers.append(optimizer)
-        writer = SummaryWriter('runs/joint-%d' % i)
+        local_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+        writer = SummaryWriter('runs/joint-%d-%s' % (i, local_time))
         writers.append(writer)
 
 criterion = nn.CrossEntropyLoss(reduction='none')
@@ -100,7 +101,7 @@ def train(config, train_loader, model, optimizer, criterion, epoch, weights, wri
             origin_loss += config.aux_weight * criterion(aux_logits, y)
         origin_losses[i] = origin_loss.detach()
         loss = (origin_loss * weights[i]).mean()
-        # loss = (origin_loss / (weights[i] + 1e-5) + torch.log(weights[i] + 1e-5)).mean()
+        # loss = (origin_loss / ((weights[i] + 1e-12) ** 2.0) + torch.log(weights[i] + 1e-12)).mean()
         loss.backward()
         # gradient clipping
         nn.utils.clip_grad_norm_(model.parameters(), config.grad_clip)
@@ -119,7 +120,7 @@ def train(config, train_loader, model, optimizer, criterion, epoch, weights, wri
     logger.info('Train: [{:3d}/{}] Prec@(1,5) ({top1.avg:.4%}, {top5.avg:.4%})'.format(
         epoch + 1, config.epochs, top1=top1, top5=top5))
 
-    return origin_losses
+    return origin_losses.detach()
 
 
 def validate(config, valid_loader, model, criterion, epoch, cur_step, writer):
@@ -161,6 +162,8 @@ best_top5 = 0.
 
 for epoch in range(args.epochs):
 
+    print(data_weights)
+
     data_losses = torch.zeros(len(dataset_train)).to(device)
 
     top1 = 0.
@@ -180,7 +183,8 @@ for epoch in range(args.epochs):
         top1 = max(top1, cur_top1)
         top5 = max(top5, cur_top5)
 
-    data_weights = data_losses.detach().sqrt()
+    data_weights = F.normalize(data_losses.sqrt(), p=1, dim=-1) * len(dataset_train)
+    
 
     # early stopping
     if top1 > best_top1:
