@@ -404,6 +404,34 @@ def train_controller(xloader, network, criterion, optimizer,
     return LossMeter.avg, ValAccMeter.avg, BaselineMeter.avg, RewardMeter.avg
 
 
+# TODO
+def get_topk_loss(xloader, network, n_samples, w_criterion, algo):
+    with torch.no_grad():
+        network.eval()
+        if algo == "random":
+            archs, valid_accs = network.return_topK(n_samples, True), []
+        elif algo == "setn":
+            archs, valid_accs = network.return_topK(n_samples, False), []
+        elif algo.startswith("darts") or algo == "gdas":
+            arch = network.genotype
+            archs, valid_accs = [arch], []
+        elif algo == "enas":
+            archs, valid_accs = [], []
+            for _ in range(n_samples):
+                _, _, sampled_arch = network.controller()
+                archs.append(sampled_arch)
+        else:
+            raise ValueError("Invalid algorithm name : {:}".format(algo))
+
+        losses = torch.zeros(len(xloader.dataset)).cuda(non_blocking=True)
+        for i, sampled_arch in enumerate(archs):
+            network.set_cal_mode("dynamic", sampled_arch)
+            for inputs, targets, _, _, indices in xloader:
+                _, logits = network(inputs.cuda(non_blocking=True))
+                losses[indices] += w_criterion(logits, targets).detach()
+
+        return losses
+
 def get_best_arch(xloader, network, n_samples, algo):
     with torch.no_grad():
         network.eval()
@@ -560,7 +588,7 @@ def main(xargs):
         time.time(), AverageMeter(), AverageMeter(), config.epochs + config.warmup,)
     # TODO
     data_weights = torch.ones(len(search_dataset))
-    
+
     for epoch in range(start_epoch, total_epoch):
         w_scheduler.update(epoch, 0.0)
         need_time = "Time Left: {:}".format(convert_secs2time(epoch_time.val * (total_epoch - epoch), True))
@@ -602,6 +630,9 @@ def main(xargs):
         logger.log("[{:}] evaluate : loss={:.2f}, accuracy@1={:.2f}%, accuracy@5={:.2f}% | {:}".format(
             epoch_str, valid_a_loss, valid_a_top1, valid_a_top5, genotype))
         valid_accuracies[epoch] = valid_a_top1
+
+        data_losses = get_topk_loss(search_loader, network, xargs.weight_candidate_num, xargs.algo)
+        data_weights = data_losses.detach().sqrt()
 
         genotypes[epoch] = genotype
         logger.log("<<<--->>> The {:}-th epoch : {:}".format(epoch_str, genotypes[epoch]))
@@ -659,7 +690,6 @@ if __name__ == "__main__":
         help="The search space name.",)
     parser.add_argument("--algo", type=str, choices=["darts-v1", "darts-v2", "gdas", "setn", "random", "enas"], 
         help="The search space name.",)
-    parser.add_argument("--method", type=str, default="ones", help="The search space name.",)
     parser.add_argument("--use_api", type=int, default=1, choices=[0, 1],
         help="Whether use API or not (which will cost much memory).",)
     # FOR GDAS
@@ -670,6 +700,8 @@ if __name__ == "__main__":
     parser.add_argument("--channel", type=int, default=16, help="The number of channels.")
     parser.add_argument("--num_cells", type=int, default=5, help="The number of cells in one stage.")
     #
+    parser.add_argument("--weight_candidate_num",type=int,default=5,
+        help="The number of selected architectures to reweigh data.",)
     parser.add_argument("--eval_candidate_num",type=int,default=100,
         help="The number of selected architectures to evaluate.",)
     #
