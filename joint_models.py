@@ -18,10 +18,6 @@ from nni.retiarii import fixed_arch
 
 
 class CLDataset(torch.utils.data.Dataset):
-    '''
-    Dataset for Curriculum Learning
-    Specificly, add the 'weights' attributes to the original dataset
-    '''
     def __init__(self, dataset):
         self.dataset = dataset
 
@@ -59,7 +55,7 @@ device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
 DATA_DIR = '~/torch-home/'
 dataset_train, dataset_valid = datasets.get_dataset(
     os.path.join(DATA_DIR, args.dataset), cutout_length=args.cutout)
-dataset_train, dataset_valid = CLDataset(dataset_train), CLDataset(dataset_valid)
+dataset_train = CLDataset(dataset_train)
 train_loader = torch.utils.data.DataLoader(
     dataset_train, batch_size=args.batch_size, shuffle=True, num_workers=args.workers)
 valid_loader = torch.utils.data.DataLoader(
@@ -134,7 +130,7 @@ def validate(config, valid_loader, model, criterion, epoch, cur_step, writer):
     model.eval()
 
     with torch.no_grad():
-        for step, (X, y, i) in enumerate(valid_loader):
+        for step, (X, y) in enumerate(valid_loader):
             X, y = X.to(device), y.to(device)
             bs = X.size(0)
 
@@ -179,7 +175,7 @@ for epoch in range(args.epochs):
 
         # validation
         cur_step = (epoch + 1) * len(train_loader)
-        cur_top1, cur_top5 = validate(args, valid_loader, model, criterion, epoch, cur_step, writer))
+        cur_top1, cur_top5 = validate(args, valid_loader, model, criterion, epoch, cur_step, writer)
 
         top1 = max(top1, cur_top1)
         top5 = max(top5, cur_top5)
@@ -187,12 +183,12 @@ for epoch in range(args.epochs):
     data_weights = data_losses.detach().sqrt()
 
     # early stopping
-    # if top1 > best_top1:
-    #     early_stop = args.early_stop
-    # else:
-    #     early_stop -= 1
-    #     if early_stop == 0:
-    #         break
+    if top1 > best_top1:
+        early_stop = args.early_stop
+    else:
+        early_stop -= 1
+        if early_stop == 0:
+            break
 
     best_top1 = max(best_top1, top1)
     best_top5 = max(best_top5, top5)
