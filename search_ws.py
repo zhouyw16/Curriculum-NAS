@@ -1,31 +1,31 @@
 ##################################################
 # Copyright (c) Xuanyi Dong [GitHub D-X-Y], 2020 #
 ##################################################
-# CUDA_VISIBLE_DEVICES=n
+# CUDA_VISIBLE_DEVICES=x
 ####
-# python ./exps/NATS-algos/search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo darts-v1 --rand_seed 777
-# python ./exps/NATS-algos/search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo darts-v1 --drop_path_rate 0.3
-# python ./exps/NATS-algos/search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo darts-v1
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo darts-v1 --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo darts-v1 --drop_path_rate 0.3
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo darts-v1
 ####
-# python ./exps/NATS-algos/search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo darts-v2 --rand_seed 777
-# python ./exps/NATS-algos/search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo darts-v2
-# python ./exps/NATS-algos/search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo darts-v2
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo darts-v2 --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo darts-v2
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo darts-v2
 ####
-# python ./exps/NATS-algos/search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo gdas --rand_seed 777
-# python ./exps/NATS-algos/search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo gdas
-# python ./exps/NATS-algos/search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo gdas
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo gdas --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo gdas
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo gdas
 ####
-# python ./exps/NATS-algos/search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo setn --rand_seed 777
-# python ./exps/NATS-algos/search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo setn
-# python ./exps/NATS-algos/search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo setn
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo setn --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo setn
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo setn
 ####
-# python ./exps/NATS-algos/search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo random --rand_seed 777
-# python ./exps/NATS-algos/search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo random
-# python ./exps/NATS-algos/search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo random
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo random --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo random
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo random
 ####
-# python ./exps/NATS-algos/search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
-# python ./exps/NATS-algos/search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
-# python ./exps/NATS-algos/search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
 ######################################################################################
 
 
@@ -47,8 +47,8 @@ from xautodl.config_utils import \
 from xautodl.datasets import \
     get_datasets, get_nas_search_loaders
 from xautodl.procedures import \
-    prepare_seed, prepare_logger, save_checkpoint \
-    copy_checkpoint, get_optim_scheduler,
+    prepare_seed, prepare_logger, save_checkpoint, \
+    copy_checkpoint, get_optim_scheduler
 from xautodl.utils import \
     count_parameters_in_MB, obtain_accuracy
 from xautodl.log_utils import \
@@ -58,6 +58,19 @@ from xautodl.models import \
 from xautodl.models.cell_searchs import \
     GenericNAS201Model
 from nats_bench import create
+
+
+
+class CLDataset(torch.utils.data.Dataset):
+    def __init__(self, dataset):
+        self.dataset = dataset
+
+    def __getitem__(self, index):
+        data = self.dataset[index]
+        return (*data), index
+
+    def __len__(self):
+        return len(self.dataset)
 
 
 
@@ -76,7 +89,7 @@ class DataGenericNAS201Model(GenericNAS201Model):
                 index = probs.max(-1, keepdim=True)[1]
                 one_h = torch.zeros_like(logits).scatter_(-1, index, 1.0)
                 hardwts = one_h - probs.detach() + probs
-                if torch.isinf(gumbels).any() or torch.isinf(probs).any()
+                if torch.isinf(gumbels).any() or torch.isinf(probs).any() \
                 or torch.isnan(probs).any():
                     continue
                 else:
@@ -143,6 +156,7 @@ def _concat(xs):
     return torch.cat([x.view(-1) for x in xs])
 
 
+
 def _hessian_vector_product(vector, network, 
     criterion, base_inputs, base_targets, r=1e-2):
     R = r / _concat(vector).norm()
@@ -161,35 +175,8 @@ def _hessian_vector_product(vector, network,
     for p, v in zip(network.weights, vector):
         p.data.add_(R, v)
     return [(x - y).div_(2 * R) for x, y in zip(grads_p, grads_n)]
-
-
-# TODO
-def _loss_weight(n_classes, loss, method):
-    if method == 'ones':
-        return torch.ones_like(loss).to(loss.device)
-    elif method == 'confidence':
-        origin_loss = loss.detach().cpu().numpy()
-        tau = np.log(n_classes)
-        lam = 1.0
-        beta = (origin_loss - tau) / lam
-        gamma = -2.0 / np.exp(1.0)
-        sigma = np.exp(-lambertw(0.5 * np.maximum(beta, gamma))).real
-        return torch.from_numpy(sigma).to(loss.device)
-    elif method == 'random':
-        return torch.rand(*loss.shape).to(loss.device)
-    elif method == 'normal':
-        return (torch.randn(*loss.shape)).add_(1.0).abs().to(loss.device)
-    elif method == 'noise':
-        origin_loss = loss.detach().cpu().numpy()
-        tau = np.log(n_classes)
-        lam = 1.0
-        beta = (origin_loss - tau) / lam
-        gamma = -2.0 / np.exp(1.0)
-        sigma = np.exp(lambertw(0.5 * np.maximum(beta, gamma))).real
-        return torch.from_numpy(sigma).to(loss.device)
-    else:
-        NotImplementedError()
     
+
 
 def backward_step_unrolled(network, criterion, base_inputs, 
     base_targets, w_optimizer, arch_inputs, arch_targets, ):
@@ -210,7 +197,7 @@ def backward_step_unrolled(network, criterion, base_inputs,
             moment = torch.zeros_like(theta)
         dtheta = _concat(torch.autograd.grad(loss, network.weights)) + WD * theta
         params = theta.sub(LR, moment + dtheta)
-    unrolled_model = deepcopy(network)
+    unrolled_model = copy.deepcopy(network)
     model_dict = unrolled_model.state_dict()
     new_params, offset = {}, 0
     for k, v in network.named_parameters():
@@ -235,20 +222,22 @@ def backward_step_unrolled(network, criterion, base_inputs,
     dalpha.data.sub_(LR, implicit_grads.data)
 
     if network.arch_parameters.grad is None:
-        network.arch_parameters.grad = deepcopy(dalpha)
+        network.arch_parameters.grad = copy.deepcopy(dalpha)
     else:
         network.arch_parameters.grad.data.copy_(dalpha.data)
     return unrolled_loss.detach(), unrolled_logits.detach()
 
 
+
 def search_func(xloader, network, w_criterion, criterion, scheduler, 
-    w_optimizer, a_optimizer, epoch_str, print_freq, algo, method, logger,):
+    w_optimizer, a_optimizer, epoch_str, print_freq, algo, data_weights, logger,):
     data_time, batch_time = AverageMeter(), AverageMeter()
     base_losses, base_top1, base_top5 = AverageMeter(), AverageMeter(), AverageMeter()
     arch_losses, arch_top1, arch_top5 = AverageMeter(), AverageMeter(), AverageMeter()
     end = time.time()
     network.train()
-    for step, (base_inputs, base_targets, arch_inputs, arch_targets) in enumerate(xloader):
+    data_weights = data_weights.cuda(non_blocking=True)
+    for step, (base_inputs, base_targets, arch_inputs, arch_targets, indices) in enumerate(xloader):
         scheduler.update(None, 1.0 * step / len(xloader))
         base_inputs = base_inputs.cuda(non_blocking=True)
         arch_inputs = arch_inputs.cuda(non_blocking=True)
@@ -256,30 +245,6 @@ def search_func(xloader, network, w_criterion, criterion, scheduler,
         arch_targets = arch_targets.cuda(non_blocking=True)
         # measure data loading time
         data_time.update(time.time() - end)
-
-        # TODO
-        # Update the weights of data
-        with torch.no_grad():
-            child_net = deepcopy(network)
-            if algo == "setn":
-                sampled_arch = child_net.dync_genotype(True)
-                child_net.set_cal_mode("dynamic", sampled_arch)
-            elif algo == "gdas":
-                child_net.set_cal_mode("gdas", None)
-            elif algo.startswith("darts"):
-                child_net.set_cal_mode("joint", None)
-            elif algo == "random":
-                child_net.set_cal_mode("urs", None)
-            elif algo == "enas":
-                with torch.no_grad():
-                    child_net.controller.eval()
-                    _, _, sampled_arch = child_net.controller()
-                child_net.set_cal_mode("dynamic", sampled_arch)
-            else:
-                raise ValueError("Invalid algo name : {:}".format(algo))
-            _, logits = child_net.childnet_forward(base_inputs)
-            base_loss = w_criterion(logits, base_targets)
-            data_weight = _loss_weight(logits.shape[-1], base_loss, method)
 
         # TODO
         # Update the weights
@@ -303,7 +268,7 @@ def search_func(xloader, network, w_criterion, criterion, scheduler,
         network.zero_grad()
         _, logits = network(base_inputs)
         # TODO
-        base_loss = (w_criterion(logits, base_targets) * data_weight).mean()
+        base_loss = (w_criterion(logits, base_targets) * data_weights[indices]).mean()
         base_loss.backward()
         w_optimizer.step()
         # record
@@ -331,9 +296,6 @@ def search_func(xloader, network, w_criterion, criterion, scheduler,
                 base_inputs, base_targets, w_optimizer, arch_inputs, arch_targets,)
             a_optimizer.step()
         elif algo == "random" or algo == "enas":
-            # random和enas就不用更新了，算个loss就行
-            # 对enas，在main里面的下一步就是train_controller
-            # 对random，都已经random了自然没有什么结构上的参数要学了
             with torch.no_grad():
                 _, logits = network(arch_inputs)
                 arch_loss = criterion(logits, arch_targets)
@@ -518,8 +480,13 @@ def main(xargs):
         extra_info = {"class_num": class_num, "xshape": xshape, "epochs": xargs.overwite_epochs,}
     config = load_config(xargs.config_path, extra_info, logger)
     search_loader, train_loader, valid_loader = get_nas_search_loaders(
-        train_data, valid_data, xargs.dataset, "configs/nas-benchmark/",
+        train_data, valid_data, xargs.dataset, "configs",
         (config.batch_size, config.test_batch_size), xargs.workers,)
+    # TODO
+    search_dataset = CLDataset(search_loader.dataset)
+    search_loader = torch.utils.data.DataLoader(search_dataset, batch_size=search_loader.batch_size, 
+        shuffle=True, num_workers=search_loader.num_workers, pin_memory=True,)
+    
     logger.log("||||||| {:10s} ||||||| Search-Loader-Num={:}, Valid-Loader-Num={:}, batch size={:}".format(
             xargs.dataset, len(search_loader), len(valid_loader), config.batch_size))
     logger.log("||||||| {:10s} ||||||| Config={:}".format(xargs.dataset, config))
@@ -591,6 +558,9 @@ def main(xargs):
     # start training
     start_time, search_time, epoch_time, total_epoch = (
         time.time(), AverageMeter(), AverageMeter(), config.epochs + config.warmup,)
+    # TODO
+    data_weights = torch.ones(len(search_dataset))
+    
     for epoch in range(start_epoch, total_epoch):
         w_scheduler.update(epoch, 0.0)
         need_time = "Time Left: {:}".format(convert_secs2time(epoch_time.val * (total_epoch - epoch), True))
@@ -601,9 +571,9 @@ def main(xargs):
         if xargs.algo == "gdas":
             network.set_tau(xargs.tau_max - (xargs.tau_max - xargs.tau_min) * epoch / (total_epoch - 1))
             logger.log("[RESET tau as : {:} and drop_path as {:}]".format(network.tau, network.drop_path))
-        (search_w_loss, search_w_top1, search_w_top5, search_a_loss, search_a_top1, search_a_top5,) 
+        (search_w_loss, search_w_top1, search_w_top5, search_a_loss, search_a_top1, search_a_top5,) \
         = search_func(search_loader, network, w_criterion, criterion, w_scheduler, w_optimizer, a_optimizer,
-            epoch_str, xargs.print_freq, xargs.algo, xargs.method, logger,)
+            epoch_str, xargs.print_freq, xargs.algo, data_weights, logger,)
         search_time.update(time.time() - start_time)
         logger.log("[{:}] search [base] : loss={:.2f}, accuracy@1={:.2f}%, accuracy@5={:.2f}%, time-cost={:.1f} s".format(
             epoch_str, search_w_loss, search_w_top1, search_w_top5, search_time.sum))
@@ -636,12 +606,12 @@ def main(xargs):
         genotypes[epoch] = genotype
         logger.log("<<<--->>> The {:}-th epoch : {:}".format(epoch_str, genotypes[epoch]))
         # save checkpoint
-        save_path = save_checkpoint({"epoch": epoch + 1,"args": deepcopy(xargs),"baseline": baseline,
+        save_path = save_checkpoint({"epoch": epoch + 1,"args": copy.deepcopy(xargs),"baseline": baseline,
             "search_model": search_model.state_dict(), "w_optimizer": w_optimizer.state_dict(),
             "a_optimizer": a_optimizer.state_dict(), "w_scheduler": w_scheduler.state_dict(),
             "genotypes": genotypes, "valid_accuracies": valid_accuracies, },
             model_base_path, logger,)
-        last_info = save_checkpoint({"epoch": epoch + 1, "args": deepcopy(args), "last_checkpoint": save_path,},
+        last_info = save_checkpoint({"epoch": epoch + 1, "args": copy.deepcopy(args), "last_checkpoint": save_path,},
             logger.path("info"),logger,)
         with torch.no_grad():
             logger.log("{:}".format(search_model.show_alphas()))
@@ -689,7 +659,7 @@ if __name__ == "__main__":
         help="The search space name.",)
     parser.add_argument("--algo", type=str, choices=["darts-v1", "darts-v2", "gdas", "setn", "random", "enas"], 
         help="The search space name.",)
-    parser.add_argument("--method", type=str, default="confidence", help="The search space name.",)
+    parser.add_argument("--method", type=str, default="ones", help="The search space name.",)
     parser.add_argument("--use_api", type=int, default=1, choices=[0, 1],
         help="Whether use API or not (which will cost much memory).",)
     # FOR GDAS
@@ -708,7 +678,7 @@ if __name__ == "__main__":
     parser.add_argument("--affine", type=int, default=0, choices=[0, 1],
         help="Whether use affine=True or False in the BN layer.",)
     parser.add_argument("--config_path", type=str, 
-        default="./configs/nas-benchmark/algos/weight-sharing.config", help="The path of configuration.",)
+        default="./configs/algos/weight-sharing.config", help="The path of configuration.",)
     parser.add_argument("--overwite_epochs", type=int,
         help="The number of epochs to overwrite that value in config files.",)
     # architecture leraning rate
@@ -720,7 +690,7 @@ if __name__ == "__main__":
     parser.add_argument("--drop_path_rate", type=float, help="The drop path rate.")
     # log
     parser.add_argument("--workers", type=int, default=2, help="number of data loading workers (default: 2)",)
-    parser.add_argument("--save_dir", type=str, default="./output/search", 
+    parser.add_argument("--save_dir", type=str, default="./outputs/search", 
         help="Folder to save checkpoints and log.",)
     parser.add_argument("--print_freq", type=int, default=200, help="print frequency (default: 200)")
     parser.add_argument("--rand_seed", type=int, help="manual seed")
