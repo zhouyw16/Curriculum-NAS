@@ -554,8 +554,9 @@ def main(xargs):
         valid_accuracies[epoch] = valid_a_top1
 
         # TODO
-        data_losses = get_topk_loss(search_loader, network, xargs.weight_candidate_num, w_criterion, xargs.algo)
-        data_weights = F.normalize(data_losses.sqrt(), p=1, dim=-1) * len(search_dataset)
+        if xargs.weight_candidate_num > 0:
+            data_losses = get_topk_loss(search_loader, network, xargs.weight_candidate_num, w_criterion, xargs.algo)
+            data_weights = F.normalize(data_losses.sqrt(), p=1, dim=-1) * len(search_dataset)
 
         genotypes[epoch] = genotype
         logger.log("<<<--->>> The {:}-th epoch : {:}".format(epoch_str, genotypes[epoch]))
@@ -623,8 +624,6 @@ if __name__ == "__main__":
     parser.add_argument("--channel", type=int, default=16, help="The number of channels.")
     parser.add_argument("--num_cells", type=int, default=5, help="The number of cells in one stage.")
     #
-    parser.add_argument("--weight_candidate_num",type=int,default=5,
-        help="The number of selected architectures to reweigh data.",)
     parser.add_argument("--eval_candidate_num",type=int,default=100,
         help="The number of selected architectures to evaluate.",)
     #
@@ -643,6 +642,9 @@ if __name__ == "__main__":
         help="weight decay for arch encoding",)
     parser.add_argument("--arch_eps", type=float, default=1e-8, help="weight decay for arch encoding")
     parser.add_argument("--drop_path_rate", type=float, help="The drop path rate.")
+    # for reweight
+    parser.add_argument("--weight_candidate_num",type=int, default=5,
+        help="The number of selected architectures to reweigh data.",)      
     # log
     parser.add_argument("--workers", type=int, default=2, help="number of data loading workers (default: 2)",)
     parser.add_argument("--save_dir", type=str, default="./outputs/search", 
