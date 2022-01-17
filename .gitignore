@@ -1,8 +1,12 @@
 .vscode
 __pycache__
+checkpoints
+outputs
+outputs_
 prev
-data
+records
 runs
 runs_
-outputs
-checkpoints
+data
+test.py
+

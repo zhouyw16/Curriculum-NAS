@@ -42,6 +42,7 @@ from scipy.special import lambertw
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from tensorboardX import SummaryWriter
 
 from xautodl.config_utils import \
     load_config, dict2config, configure2str
@@ -331,14 +332,15 @@ def get_topk_loss(xloader, network, n_samples, w_criterion, algo):
     with torch.no_grad():
         network.eval()
         if algo == "random":
-            archs, valid_accs = network.return_topK(n_samples, True), []
+            archs = network.return_topK(n_samples, True)
         elif algo == "setn":
-            archs, valid_accs = network.return_topK(n_samples, False), []
+            archs = network.return_topK(n_samples, False)
         elif algo.startswith("darts") or algo == "gdas":
-            arch = network.genotype
-            archs, valid_accs = [arch], []
+            archs = network.return_topK(n_samples, False)
+            # arch = network.genotype
+            # archs = [arch]
         elif algo == "enas":
-            archs, valid_accs = [], []
+            archs = []
             for _ in range(n_samples):
                 _, _, sampled_arch = network.controller()
                 archs.append(sampled_arch)
@@ -422,7 +424,11 @@ def main(xargs):
     torch.backends.cudnn.deterministic = True
     torch.set_num_threads(xargs.workers)
     prepare_seed(xargs.rand_seed)
-    logger = prepare_logger(args)
+    logger = prepare_logger(xargs)
+
+    if xargs.trace_rank:
+        base_writer = SummaryWriter('outputs/trace-rank/%s-%d-base' % (xargs.algo, xargs.subnet_candidate_num))
+        weight_writer = SummaryWriter('outputs/trace-rank/%s-%d-weight' % (xargs.algo, xargs.subnet_candidate_num))
 
     train_data, valid_data, xshape, class_num = get_datasets(
         xargs.dataset, xargs.data_path, -1)
@@ -554,9 +560,20 @@ def main(xargs):
         valid_accuracies[epoch] = valid_a_top1
 
         # TODO
-        if xargs.weight_candidate_num > 0:
-            data_losses = get_topk_loss(search_loader, network, xargs.weight_candidate_num, w_criterion, xargs.algo)
+        if xargs.subnet_candidate_num > 0:
+            data_losses = get_topk_loss(search_loader, network, xargs.subnet_candidate_num, w_criterion, xargs.algo)
             data_weights = F.normalize(data_losses.sqrt(), p=1, dim=-1) * len(search_dataset)
+
+        # TODO
+        if xargs.trace_rank:
+            base_arch = '|nor_conv_3x3~0|+|nor_conv_1x1~0|none~1|+|nor_conv_3x3~0|nor_conv_1x1~1|nor_conv_3x3~2|'
+            weight_arch = '|nor_conv_3x3~0|+|nor_conv_1x1~0|skip_connect~1|+|nor_conv_3x3~0|nor_conv_3x3~1|nor_conv_3x3~2|'
+            base_i, base_n = network.return_rank(base_arch)
+            weight_i, weight_n = network.return_rank(weight_arch)
+            logger.log('*base arch rank* %d / %d' % (base_i, base_n))
+            logger.log('*weight arch rank* %d / %d' % (weight_i, weight_n))
+            base_writer.add_scalar('%s-rank' % args.algo, base_i, global_step=epoch)
+            weight_writer.add_scalar('%s-rank' % args.algo, weight_i, global_step=epoch)
 
         genotypes[epoch] = genotype
         logger.log("<<<--->>> The {:}-th epoch : {:}".format(epoch_str, genotypes[epoch]))
@@ -643,8 +660,10 @@ if __name__ == "__main__":
     parser.add_argument("--arch_eps", type=float, default=1e-8, help="weight decay for arch encoding")
     parser.add_argument("--drop_path_rate", type=float, help="The drop path rate.")
     # for reweight
-    parser.add_argument("--weight_candidate_num",type=int, default=5,
-        help="The number of selected architectures to reweigh data.",)      
+    parser.add_argument("--subnet_candidate_num", type=int, default=5,
+        help="The number of selected architectures to reweigh data.",)
+    parser.add_argument("--trace_rank", default=False, action='store_true',
+        help="Trace the rank of the final architecture.",)   
     # log
     parser.add_argument("--workers", type=int, default=2, help="number of data loading workers (default: 2)",)
     parser.add_argument("--save_dir", type=str, default="./outputs/search", 
@@ -655,10 +674,10 @@ if __name__ == "__main__":
     if args.rand_seed is None or args.rand_seed < 0:
         args.rand_seed = random.randint(1, 100000)
     if args.overwite_epochs is None:
-        args.save_dir = os.path.join("{:}-{:}".format(args.save_dir, args.search_space), args.dataset,
+        args.save_dir = os.path.join("{:}-{:}".format(args.save_dir, args.search_space), "{:}-{:}".format(args.dataset, args.subnet_candidate_num),
             "{:}-affine{:}_BN{:}-{:}".format(args.algo, args.affine, args.track_running_stats, args.drop_path_rate),)
     else:
-        args.save_dir = os.path.join("{:}-{:}".format(args.save_dir, args.search_space), args.dataset,
+        args.save_dir = os.path.join("{:}-{:}".format(args.save_dir, args.search_space), "{:}-{:}".format(args.dataset, args.subnet_candidate_num),
             "{:}-affine{:}_BN{:}-E{:}-{:}".format(args.algo, args.affine, args.track_running_stats,args.overwite_epochs, args.drop_path_rate,),)
 
     main(args)
