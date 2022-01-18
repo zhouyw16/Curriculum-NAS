@@ -427,8 +427,8 @@ def main(xargs):
     logger = prepare_logger(xargs)
 
     if xargs.trace_rank:
-        base_writer = SummaryWriter('outputs/trace-rank/%s-%d-base' % (xargs.algo, xargs.subnet_candidate_num))
-        weight_writer = SummaryWriter('outputs/trace-rank/%s-%d-weight' % (xargs.algo, xargs.subnet_candidate_num))
+        base_writer = SummaryWriter('outputs/trace-rank/%s-%d-base-%d' % (xargs.algo, xargs.subnet_candidate_num, xargs.rand_seed))
+        weight_writer = SummaryWriter('outputs/trace-rank/%s-%d-weight-%d' % (xargs.algo, xargs.subnet_candidate_num, xargs.rand_seed))
 
     train_data, valid_data, xshape, class_num = get_datasets(
         xargs.dataset, xargs.data_path, -1)
@@ -570,10 +570,10 @@ def main(xargs):
             weight_arch = '|nor_conv_3x3~0|+|nor_conv_1x1~0|skip_connect~1|+|nor_conv_3x3~0|nor_conv_3x3~1|nor_conv_3x3~2|'
             base_i, base_n = network.return_rank(base_arch)
             weight_i, weight_n = network.return_rank(weight_arch)
-            logger.log('*base arch rank* %d / %d' % (base_i, base_n))
-            logger.log('*weight arch rank* %d / %d' % (weight_i, weight_n))
-            base_writer.add_scalar('%s-rank' % args.algo, base_i, global_step=epoch)
-            weight_writer.add_scalar('%s-rank' % args.algo, weight_i, global_step=epoch)
+            logger.log('*base arch rank* %d / %d' % (base_i + 1, base_n))
+            logger.log('*weight arch rank* %d / %d' % (weight_i + 1, weight_n))
+            base_writer.add_scalar('%s-rank' % args.algo, base_i + 1, global_step=epoch)
+            weight_writer.add_scalar('%s-rank' % args.algo, weight_i + 1, global_step=epoch)
 
         genotypes[epoch] = genotype
         logger.log("<<<--->>> The {:}-th epoch : {:}".format(epoch_str, genotypes[epoch]))
