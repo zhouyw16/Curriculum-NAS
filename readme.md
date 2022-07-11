@@ -132,13 +132,13 @@ def get_optim_scheduler(parameters, config, two_criterion=False):
 
 4. Run
 
-The gpu device can be selected by setting the index of CUDA_VISIBLE_DEVICES. 
-
-Other running commands can refer to the beginning of **search_ws.py**.
-
 ```bash
 CUDA_VISIBLE_DEVICES=0 python search_ws.py --dataset cifar10 --data_path $TORCH_HOME --algo darts-v1 --rand_seed 777 --subnet_candidate_num 5
 ```
+
+The gpu device can be selected by setting the index of CUDA_VISIBLE_DEVICES. 
+
+Other running commands can refer to the beginning of **search_ws.py**.
 
 5. Batch Run
 ```bash
