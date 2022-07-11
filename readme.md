@@ -1,30 +1,51 @@
 # Readme
 
 
-## To Run the code
+## Introduction
 
+The code of the ACM MM 2022 paper
+
+Curriculum-NAS: Curriculum Weight-Sharing Neural Architecture Search
+
+<img src="docs/framework.png">
+
+The code is developed based on [XAutoDL](https://github.com/D-X-Y/AutoDL-Projects).
+
+
+# Requirements
+
+1. python >= 3.6
+
+2. pytorch >= 1.9.0
+
+
+## To Run the code
 
 1. Clone the repository
 
 ```bash
-git clone git@github.com:zhouyw16/data-nas.git
+git clone https://github.com/zhouyw16/curriculum-nas.git
 ```
 
 2. Setup the environment
 
 ```bash
-cd data-nas
-source ~/pyenv/bin/activate
-export TORCH_HOME=</data and XAutoDL files>
+cd curriculum-nas
+export TORCH_HOME=<datasets and XAutoDL benchmark files>
 ```
+For example, if there is a directory named 'torch_home', which contains cifar-10-batches-py, cifar-100-python, ImageNet16 and NATS-sss-v1_0-50262-simple. Then it needs to be exported as an environment variable TORCH_HOME.
+
+The three datasets directories can be automatically installed. The benchmark directory should be manually downloaded from the link provided in the Readme file of [NATS-Bench](https://github.com/D-X-Y/NATS-Bench).
 
 3. Modify the XAutoDL module
 ```bash
 pip install xautodl
 ```
 
+Before running the code, it is necessary to add/modify some specific functions in xautodl library. Generally, the path of the files modified below is /usr/lib/python/site-packages/xautodl. A easy way is to jump to the definition of the following functions with the help of your IDE.
+
 ```python
-# evaluation_utils.py
+# Modify: xautodl/utils/evaluation_utils.py
 def obtain_accuracy(output, target, topk=(1,)):
     """Computes the precision@k for the specified values of k"""
     maxk = max(topk)
@@ -40,7 +61,7 @@ def obtain_accuracy(output, target, topk=(1,)):
         res.append(correct_k.mul_(100.0 / batch_size))
     return res
 
-# XAutoDL/optimizers.py
+# Modify: xautodl/procedures/optimizers.py
 def get_optim_scheduler(parameters, config, two_criterion=False):
     ......
     if config.criterion == "Softmax":
@@ -55,7 +76,7 @@ def get_optim_scheduler(parameters, config, two_criterion=False):
         return optim, scheduler, criterion, w_criterion
     ......
 
-# XAutoDL/generic_model.py
+# Add: xautodl/models/cell_searchs/generic_model.py/class GenericNAS201Model
     def return_rank(self, arch):
         archs = Structure.gen_all(self._op_names, self._max_nodes, False)
         pairs = [(self.get_log_prob(a), a) for a in archs]
@@ -72,7 +93,7 @@ def get_optim_scheduler(parameters, config, two_criterion=False):
 
 4. Run
 ```bash
-CUDA_VISIBLE_DEVICES=n python search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo darts-v1 --rand_seed 777 --subnet_candidate_num 5
+<CUDA_VISIBLE_DEVICES=0> python search_ws.py --dataset cifar10 --data_path $TORCH_HOME/cifar.python --algo darts-v1 --rand_seed 777 --subnet_candidate_num 5
 ```
 
 5. Batch Run

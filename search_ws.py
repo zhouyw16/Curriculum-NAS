@@ -67,7 +67,7 @@ class CLDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         data = self.dataset[index]
-        return (*data), index
+        return [part for part in data] + [index]
 
     def __len__(self):
         return len(self.dataset)
