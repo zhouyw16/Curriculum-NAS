@@ -12,7 +12,7 @@ Curriculum-NAS: Curriculum Weight-Sharing Neural Architecture Search
 The code is developed based on [XAutoDL](https://github.com/D-X-Y/AutoDL-Projects).
 
 
-# Requirements
+## Requirements
 
 1. python >= 3.6
 
@@ -33,7 +33,7 @@ git clone https://github.com/zhouyw16/curriculum-nas.git
 cd curriculum-nas
 export TORCH_HOME=<The directory containing datasets and XAutoDL benchmarks>
 ```
-For example, we need to make a directory, put **cifar-10-batches-py**, **cifar-100-python**, **ImageNet16** and **NATS-sss-v1_0-50262-simple** into it, and export it as an environment variable TORCH_HOME.
+For example, we need to make a directory, put **cifar-10-batches-py**, **cifar-100-python**, **ImageNet16** and **NATS-tss-v1_0-3ffb9-simple** into it, and export it as an environment variable TORCH_HOME.
 
 The three datasets directories can be automatically installed. The benchmark directory should be manually downloaded from the link provided in code repository [NATS-Bench](https://github.com/D-X-Y/NATS-Bench).
 
@@ -63,7 +63,46 @@ def obtain_accuracy(output, target, topk=(1,)):
 
 # Modify: xautodl/procedures/optimizers.py
 def get_optim_scheduler(parameters, config, two_criterion=False):
-    ......
+    assert (
+        hasattr(config, "optim")
+        and hasattr(config, "scheduler")
+        and hasattr(config, "criterion")
+    ), "config must have optim / scheduler / criterion keys instead of {:}".format(
+        config
+    )
+    if config.optim == "SGD":
+        optim = torch.optim.SGD(
+            parameters,
+            config.LR,
+            momentum=config.momentum,
+            weight_decay=config.decay,
+            nesterov=config.nesterov,
+        )
+    elif config.optim == "RMSprop":
+        optim = torch.optim.RMSprop(
+            parameters, config.LR, momentum=config.momentum, weight_decay=config.decay
+        )
+    else:
+        raise ValueError("invalid optim : {:}".format(config.optim))
+
+    if config.scheduler == "cos":
+        T_max = getattr(config, "T_max", config.epochs)
+        scheduler = CosineAnnealingLR(
+            optim, config.warmup, config.epochs, T_max, config.eta_min
+        )
+    elif config.scheduler == "multistep":
+        scheduler = MultiStepLR(
+            optim, config.warmup, config.epochs, config.milestones, config.gammas
+        )
+    elif config.scheduler == "exponential":
+        scheduler = ExponentialLR(optim, config.warmup, config.epochs, config.gamma)
+    elif config.scheduler == "linear":
+        scheduler = LinearLR(
+            optim, config.warmup, config.epochs, config.LR, config.LR_min
+        )
+    else:
+        raise ValueError("invalid scheduler : {:}".format(config.scheduler))
+
     if config.criterion == "Softmax":
         criterion = torch.nn.CrossEntropyLoss()
         w_criterion = torch.nn.CrossEntropyLoss(reduction='none')
@@ -74,7 +113,7 @@ def get_optim_scheduler(parameters, config, two_criterion=False):
         raise ValueError("invalid criterion : {:}".format(config.criterion))
     if two_criterion:
         return optim, scheduler, criterion, w_criterion
-    ......
+    return optim, scheduler, criterion
 
 # Add: xautodl/models/cell_searchs/generic_model.py/class GenericNAS201Model
     def return_rank(self, arch):
@@ -93,10 +132,17 @@ def get_optim_scheduler(parameters, config, two_criterion=False):
 
 4. Run
 ```bash
-<CUDA_VISIBLE_DEVICES=0> python search_ws.py --dataset cifar10 --data_path $TORCH_HOME/cifar.python --algo darts-v1 --rand_seed 777 --subnet_candidate_num 5
+<CUDA_VISIBLE_DEVICES=0> python search_ws.py --dataset cifar10 --data_path $TORCH_HOME --algo darts-v1 --rand_seed 777 --subnet_candidate_num 5
 ```
 
 5. Batch Run
 ```bash
 bash run-ws.sh
+```
+
+
+## Cite
+Please cite our paper as follows if you find our work useful:
+```
+To be supplemented later.
 ```

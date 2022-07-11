@@ -8,7 +8,7 @@ for seed in ${seeds}
   do
   for alg in ${algos}
   do
-    CUDA_VISIBLE_DEVICES=0 python search_ws.py --dataset cifar10  --data_path $TORCH_HOME --algo ${alg} --rand_seed ${seed} --subnet_candidate_num ${num}
+    CUDA_VISIBLE_DEVICES=0 python search_ws.py --dataset cifar10 --data_path $TORCH_HOME --algo ${alg} --rand_seed ${seed} --subnet_candidate_num ${num}
   done
 done
 

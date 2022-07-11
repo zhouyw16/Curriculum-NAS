@@ -3,29 +3,29 @@
 ##################################################
 # CUDA_VISIBLE_DEVICES=x
 ####
-# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo darts-v1 --rand_seed 777
-# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo darts-v1 --drop_path_rate 0.3
-# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo darts-v1
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME --algo darts-v1 --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME --algo darts-v1 --drop_path_rate 0.3
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/ImageNet16 --algo darts-v1
 ####
-# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo darts-v2 --rand_seed 777
-# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo darts-v2
-# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo darts-v2
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME --algo darts-v2 --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME --algo darts-v2
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/ImageNet16 --algo darts-v2
 ####
-# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo gdas --rand_seed 777
-# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo gdas
-# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo gdas
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME --algo gdas --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME --algo gdas
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/ImageNet16 --algo gdas
 ####
-# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo setn --rand_seed 777
-# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo setn
-# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo setn
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME --algo setn --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME --algo setn
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/ImageNet16 --algo setn
 ####
-# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo random --rand_seed 777
-# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo random
-# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo random
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME --algo random --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME --algo random
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/ImageNet16 --algo random
 ####
-# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
-# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
-# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
+# python ./search_ws.py --dataset cifar10  --data_path $TORCH_HOME --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
+# python ./search_ws.py --dataset cifar100 --data_path $TORCH_HOME --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
+# python ./search_ws.py --dataset ImageNet16-120 --data_path $TORCH_HOME/ImageNet16 --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001 --rand_seed 777
 ######################################################################################
 
 

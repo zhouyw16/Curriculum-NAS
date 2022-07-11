@@ -1,5 +1,6 @@
 .vscode
 __pycache__
+torch_home
 checkpoints
 outputs
 outputs_
