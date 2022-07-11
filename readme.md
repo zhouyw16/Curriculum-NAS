@@ -35,7 +35,7 @@ export TORCH_HOME=<The directory containing datasets and XAutoDL benchmarks>
 ```
 For example, we need to make a directory, put **cifar-10-batches-py**, **cifar-100-python**, **ImageNet16** and **NATS-tss-v1_0-3ffb9-simple** into it, and export it as an environment variable TORCH_HOME.
 
-The three datasets directories can be automatically installed. The benchmark directory should be manually downloaded from the link provided in code repository [NATS-Bench](https://github.com/D-X-Y/NATS-Bench).
+The cifar10 and cifar100 datasets can be automatically downloaded. The imagenet dataset needs to be maually downloaded from the official [website](https://image-net.org/download-images) and the benchmark files from the link provided in code repository [NATS-Bench](https://github.com/D-X-Y/NATS-Bench).
 
 3. Modify the XAutoDL module
 ```bash
@@ -131,8 +131,13 @@ def get_optim_scheduler(parameters, config, two_criterion=False):
 
 
 4. Run
+
+The gpu device can be selected by setting the index of CUDA_VISIBLE_DEVICES. 
+
+Other running commands can refer to the beginning of **search_ws.py**.
+
 ```bash
-<CUDA_VISIBLE_DEVICES=0> python search_ws.py --dataset cifar10 --data_path $TORCH_HOME --algo darts-v1 --rand_seed 777 --subnet_candidate_num 5
+CUDA_VISIBLE_DEVICES=0 python search_ws.py --dataset cifar10 --data_path $TORCH_HOME --algo darts-v1 --rand_seed 777 --subnet_candidate_num 5
 ```
 
 5. Batch Run
