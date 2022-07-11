@@ -15,7 +15,7 @@ git clone git@github.com:zhouyw16/data-nas.git
 ```bash
 cd data-nas
 source ~/pyenv/bin/activate
-export TORCH_HOME=/DATA/DATANAS1/zyw16/TorchData/
+export TORCH_HOME=</data and XAutoDL files>
 ```
 
 3. Modify the XAutoDL module
@@ -40,7 +40,7 @@ def obtain_accuracy(output, target, topk=(1,)):
         res.append(correct_k.mul_(100.0 / batch_size))
     return res
 
-# optimizers.py
+# XAutoDL/optimizers.py
 def get_optim_scheduler(parameters, config, two_criterion=False):
     ......
     if config.criterion == "Softmax":
@@ -55,7 +55,7 @@ def get_optim_scheduler(parameters, config, two_criterion=False):
         return optim, scheduler, criterion, w_criterion
     ......
 
-# generic_model.py
+# XAutoDL/generic_model.py
     def return_rank(self, arch):
         archs = Structure.gen_all(self._op_names, self._max_nodes, False)
         pairs = [(self.get_log_prob(a), a) for a in archs]
