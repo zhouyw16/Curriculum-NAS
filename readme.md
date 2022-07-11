@@ -3,7 +3,7 @@
 
 ## Introduction
 
-The code of the ACM MM 2022 paper
+The code of the ACM MM 2022 paper.
 
 Curriculum-NAS: Curriculum Weight-Sharing Neural Architecture Search
 
@@ -31,11 +31,11 @@ git clone https://github.com/zhouyw16/curriculum-nas.git
 
 ```bash
 cd curriculum-nas
-export TORCH_HOME=<datasets and XAutoDL benchmark files>
+export TORCH_HOME=<The directory containing datasets and XAutoDL benchmarks>
 ```
-For example, if there is a directory named 'torch_home', which contains cifar-10-batches-py, cifar-100-python, ImageNet16 and NATS-sss-v1_0-50262-simple. Then it needs to be exported as an environment variable TORCH_HOME.
+For example, we need to make a directory, put **cifar-10-batches-py**, **cifar-100-python**, **ImageNet16** and **NATS-sss-v1_0-50262-simple** into it, and export it as an environment variable TORCH_HOME.
 
-The three datasets directories can be automatically installed. The benchmark directory should be manually downloaded from the link provided in the Readme file of [NATS-Bench](https://github.com/D-X-Y/NATS-Bench).
+The three datasets directories can be automatically installed. The benchmark directory should be manually downloaded from the link provided in code repository [NATS-Bench](https://github.com/D-X-Y/NATS-Bench).
 
 3. Modify the XAutoDL module
 ```bash
