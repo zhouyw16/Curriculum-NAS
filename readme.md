@@ -3,7 +3,7 @@
 
 ## Introduction
 
-The code of the ACM MM 2022 paper.
+The code of the ACM MM 2022 [paper](https://github.com/zhouyw16/curriculum-nas/raw/master/docs/Curriculum_NAS.pdf).
 
 Curriculum-NAS: Curriculum Weight-Sharing Neural Architecture Search
 
