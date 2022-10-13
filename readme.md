@@ -3,7 +3,7 @@
 
 ## Introduction
 
-The code of the ACM MM 2022 [paper](https://github.com/zhouyw16/curriculum-nas/raw/master/docs/Curriculum_NAS.pdf).
+The code of the ACM MM 2022 [paper](https://dl.acm.org/doi/pdf/10.1145/3503161.3548271).
 
 Curriculum-NAS: Curriculum Weight-Sharing Neural Architecture Search
 
@@ -149,5 +149,13 @@ bash run-ws.sh
 ## Cite
 Please cite our paper as follows if you find our work useful:
 ```
-To be supplemented later.
+@inproceedings{10.1145/3503161.3548271,
+    author = {Zhou, Yuwei and Wang, Xin and Chen, Hong and Duan, Xuguang and Guan, Chaoyu and Zhu, Wenwu},
+    title = {Curriculum-NAS: Curriculum Weight-Sharing Neural Architecture Search},
+    year = {2022},
+    publisher = {Association for Computing Machinery},
+    doi = {10.1145/3503161.3548271},
+    booktitle = {Proceedings of the 30th ACM International Conference on Multimedia},
+    pages = {6792–6801}
+}
 ```
