@@ -9,7 +9,7 @@ Curriculum-NAS: Curriculum Weight-Sharing Neural Architecture Search
 
 <img src="docs/framework.png">
 
-The code is developed based on [XAutoDL](https://github.com/D-X-Y/AutoDL-Projects).
+The code is developed based on [XAutoDL](https://github.com/D-X-Y/AutoDL-Projects). The modified and added parts are marked with **modified / added** in the *search_ws.py* file.
 
 
 ## Requirements
@@ -130,7 +130,7 @@ def get_optim_scheduler(parameters, config, two_criterion=False):
 ```
 
 
-4. Run
+4. Run. Note: The modified and added parts are marked with **modified / added** in the *search_ws.py* file.
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python search_ws.py --dataset cifar10 --data_path $TORCH_HOME --algo darts-v1 --rand_seed 777 --subnet_candidate_num 5
