@@ -169,7 +169,7 @@ def search_func(xloader, network, w_criterion, criterion, scheduler,
         # measure data loading time
         data_time.update(time.time() - end)
 
-        # TODO
+        # Modified / Added
         # Update the weights
         if algo == "setn":
             sampled_arch = network.dync_genotype(True)
@@ -190,7 +190,8 @@ def search_func(xloader, network, w_criterion, criterion, scheduler,
 
         network.zero_grad()
         _, logits = network(base_inputs)
-        # TODO
+        
+        # Modified / Added
         base_loss = (w_criterion(logits, base_targets) * data_weights[indices]).mean()
         base_loss.backward()
         w_optimizer.step()
@@ -201,7 +202,7 @@ def search_func(xloader, network, w_criterion, criterion, scheduler,
         base_top1.update(base_prec1.item(), base_inputs.size(0))
         base_top5.update(base_prec5.item(), base_inputs.size(0))
 
-        # TODO
+        # Modified / Added
         # update the architecture-weight
         if algo == "setn":
             network.set_cal_mode("joint")
@@ -327,7 +328,7 @@ def train_controller(xloader, network, criterion, optimizer,
     return LossMeter.avg, ValAccMeter.avg, BaselineMeter.avg, RewardMeter.avg
 
 
-# TODO
+# Modified / Added
 def get_topk_loss(xloader, network, n_samples, w_criterion, algo):
     with torch.no_grad():
         network.eval()
@@ -440,7 +441,8 @@ def main(xargs):
     search_loader, train_loader, valid_loader = get_nas_search_loaders(
         train_data, valid_data, xargs.dataset, "configs",
         (config.batch_size, config.test_batch_size), xargs.workers,)
-    # TODO
+    
+    # Modified / Added
     search_dataset = CLDataset(search_loader.dataset)
     search_loader = torch.utils.data.DataLoader(search_dataset, batch_size=search_loader.batch_size, 
         shuffle=True, num_workers=search_loader.num_workers, pin_memory=True,)
@@ -464,7 +466,7 @@ def main(xargs):
     search_model.set_algo(xargs.algo)
     # logger.log("{:}".format(search_model))
 
-    # TODO
+    # Modified / Added
     w_optimizer, w_scheduler, criterion, w_criterion = get_optim_scheduler(
         search_model.weights, config, two_criterion=True)
     a_optimizer = torch.optim.Adam(search_model.alphas,
@@ -513,7 +515,8 @@ def main(xargs):
     # start training
     start_time, search_time, epoch_time, total_epoch = (
         time.time(), AverageMeter(), AverageMeter(), config.epochs + config.warmup,)
-    # TODO
+    
+    # Modified / Added
     data_weights = torch.ones(len(search_dataset))
 
     for epoch in range(start_epoch, total_epoch):
@@ -559,12 +562,12 @@ def main(xargs):
             epoch_str, valid_a_loss, valid_a_top1, valid_a_top5, genotype))
         valid_accuracies[epoch] = valid_a_top1
 
-        # TODO
+        # Modified / Added
         if xargs.subnet_candidate_num > 0:
             data_losses = get_topk_loss(search_loader, network, xargs.subnet_candidate_num, w_criterion, xargs.algo)
             data_weights = F.normalize(data_losses.sqrt(), p=1, dim=-1) * len(search_dataset)
 
-        # TODO
+        # Modified / Added
         if xargs.trace_rank:
             base_arch = '|nor_conv_3x3~0|+|nor_conv_1x1~0|none~1|+|nor_conv_3x3~0|nor_conv_1x1~1|nor_conv_3x3~2|'
             weight_arch = '|nor_conv_3x3~0|+|nor_conv_1x1~0|skip_connect~1|+|nor_conv_3x3~0|nor_conv_3x3~1|nor_conv_3x3~2|'
