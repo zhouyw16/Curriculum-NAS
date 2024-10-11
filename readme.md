@@ -3,7 +3,7 @@
 
 ## Introduction
 
-The code of the ACM MM 2022 paper. **Curriculum-NAS: Curriculum Weight-Sharing Neural Architecture Search**
+The code of the ACM MM 2022 paper **Curriculum-NAS: Curriculum Weight-Sharing Neural Architecture Search**.
 
 The paper can be downloaded from the [official website](https://dl.acm.org/doi/pdf/10.1145/3503161.3548271) or in the [docs directory](https://github.com/zhouyw16/curriculum-nas/tree/master/docs).
 
